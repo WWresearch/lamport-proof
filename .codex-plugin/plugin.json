@@ -1,0 +1,35 @@
+{
+  "name": "lamport-proof-toolkit",
+  "version": "0.1.0",
+  "description": "Audit Lamport-style proof hierarchies and separately trace conclusion-first obligation graphs.",
+  "author": {
+    "name": "Wojciech Aleksander Wołoszyn (WWresearch)",
+    "url": "https://www.wwresearch.org/"
+  },
+  "homepage": "https://www.wwresearch.org/",
+  "license": "MIT",
+  "keywords": [
+    "mathematical-proof",
+    "lamport-proof",
+    "proof-audit",
+    "proof-obligations"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Lamport Proof Toolkit",
+    "shortDescription": "Audit proof structure and conclusion obligations",
+    "longDescription": "Check an existing Lamport-style hierarchical proof forward for valid scope and construct discharge, or use the WWresearch reverse audit to trace its conclusion as a bounded AND/OR obligation graph. The reverse audit is not a method authored or endorsed by Leslie Lamport.",
+    "developerName": "WWresearch",
+    "category": "Research",
+    "websiteURL": "https://www.wwresearch.org/",
+    "capabilities": [
+      "Analyze",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Audit this hierarchical Lamport proof for scope and validity.",
+      "Trace this proof backward as an AND/OR obligation graph.",
+      "Run both Lamport audits and keep their verdicts separate."
+    ]
+  }
+}
