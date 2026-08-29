@@ -39,3 +39,19 @@ The forward audit targets the hierarchical proof style described by Leslie Lampo
 Published by [WWresearch](https://www.wwresearch.org/). Copyright (c) 2026 Wojciech Aleksander Wołoszyn (WWresearch).
 
 Released under the [MIT License](LICENSE).
+
+## Validation
+
+From the checkout root, run the standalone repository gate:
+
+```bash
+python3 -B scripts/check_repository.py
+```
+
+The gate validates the plugin manifest and both skills with the current Codex validators, checks the exact toolkit skill inventory, cross-skill references, worked example, licensing and provenance metadata, and UI prompt wiring, rejects symlinks, generated residue, credential artifacts, workflow markers, and workstation-specific paths, and runs Python `unittest` discovery whenever a `tests/` directory is present. It fails if tests are absent from a present test directory, mutate distributable repository contents, or leave new residue.
+
+Use `--skip-tests` only when isolating structural or Codex-validator failures. The full command above is the required repository gate.
+
+The script resolves the repository relative to its own location, so invoking it by an absolute or relative path also works from another working directory.
+
+This is a developer gate for the distributable repository tree, not a sandbox or a release-state check. It treats the installed Codex validators and checked-in tests as trusted local code. It does not enforce a Git branch, clean worktree, tag, remote, or publication decision; those checks belong in a separate release workflow.
