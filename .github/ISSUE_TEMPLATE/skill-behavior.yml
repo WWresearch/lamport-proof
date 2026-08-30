@@ -1,0 +1,69 @@
+name: Skill behavior or evaluation
+description: Report a reproducible conversion or audit behavior that conflicts with a documented skill contract.
+title: "[Skill behavior]: "
+labels:
+  - skill-behavior
+  - evaluation
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Provide a minimal, shareable proof example. Do not submit confidential manuscripts
+        or rely on a headline verdict alone; include the relevant ledger or obligation finding.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - convert-lamport
+        - forward-lamport
+        - reverse-lamport
+        - Combined workflow
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.2.0
+    validations:
+      required: true
+  - type: textarea
+    id: theorem
+    attributes:
+      label: Minimal theorem and submitted proof
+      description: Include domains, hypotheses, the exact conclusion, and only material safe to publish.
+    validations:
+      required: true
+  - type: textarea
+    id: invocation
+    attributes:
+      label: Exact invocation
+      description: State which skills ran and in what order.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed outcome and supporting detail
+      description: Include the relevant mapping, ledger, finding, graph node, or unresolved obligation.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected contract behavior
+      description: Explain the documented rule you expected the skill to follow.
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Submission checks
+      options:
+        - label: The example is minimal and safe to publish.
+          required: true
+        - label: I kept conversion, forward, and reverse outcomes separate where applicable.
+          required: true
+        - label: This report does not disclose a security vulnerability.
+          required: true

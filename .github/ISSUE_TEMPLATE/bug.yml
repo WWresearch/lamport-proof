@@ -1,0 +1,65 @@
+name: Repository or packaging bug
+description: Report a reproducible problem with installation, validation, metadata, or repository tooling.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Do not include credentials, private proof material, or security vulnerabilities.
+        Use the security policy for private reports.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Provide the release tag or full commit identifier.
+      placeholder: v0.2.0
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Installation
+        - Repository checker
+        - Isolated staging
+        - Package metadata
+        - Documentation
+        - CI
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Include commands and sanitized output sufficient to reproduce the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the operating system and Python and Codex versions when relevant.
+  - type: checkboxes
+    id: hygiene
+    attributes:
+      label: Submission checks
+      options:
+        - label: I removed credentials, private proof material, generated transcripts, and local paths.
+          required: true
+        - label: This report does not disclose a security vulnerability.
+          required: true
