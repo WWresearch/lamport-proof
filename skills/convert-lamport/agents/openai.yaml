@@ -1,0 +1,4 @@
+interface:
+  display_name: "Convert to Lamport Style"
+  short_description: "Source-map proofs into Lamport style"
+  default_prompt: "Use $convert-lamport to convert this submitted proof into a source-mapped Lamport-style hierarchy without repairing it."
