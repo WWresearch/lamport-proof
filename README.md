@@ -6,7 +6,9 @@
 
 **Convert · Forward · Reverse**
 
-Lamport Proof is an independent [WWresearch](https://www.wwresearch.org/) toolkit of Codex skills for converting an existing proof into a source-mapped Lamport-style hierarchy and auditing a submitted proof in two complementary directions.
+Convert existing mathematical proofs into traceable Lamport-style hierarchies and audit the reasoning forward and backward.
+
+Lamport Proof is an independent [WWresearch](https://www.wwresearch.org/) project distributed as three Codex skills: `$convert-lamport`, `$forward-lamport`, and `$reverse-lamport`.
 
 The toolkit produces model-assisted conversion and audit reports. It is not a proof assistant, a proof checker, or a formal-verification certificate. “Lamport” refers descriptively to the hierarchical proof style discussed in Leslie Lamport's publications; Leslie Lamport did not author, review, sponsor, or endorse this project.
 
@@ -36,7 +38,7 @@ For a combined review:
 
 1. Freeze one exact theorem statement, source boundary, and set of accepted primitives.
 2. Run `$convert-lamport` if the submitted proof is not already hierarchical.
-3. Check the conversion status. `NOT SOURCE-MAPPABLE` stops the workflow because no audit object exists. For `PARTIALLY SOURCE-MAPPED`, continue only on the exact defensible rendering and keep every unresolved reading open.
+3. Check the conversion status. `NOT SOURCE-MAPPABLE` stops the workflow because no audit object exists; absent theorem or proof input is a source-boundary condition, not an open proof obligation. For `PARTIALLY SOURCE-MAPPED`, continue only on the exact defensible rendering and keep every unresolved reading open.
 4. Freeze the converted rendering and its source-mapping ledger; do not revise it during the audits.
 5. Run `$forward-lamport` on the frozen hierarchy.
 6. Run `$reverse-lamport` last against the same theorem contract and the legal forward ledger.
@@ -143,6 +145,7 @@ The source-mapping conversion contract, forward audit procedure, and `$reverse-l
 ## Project information
 
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing changes.
+- Follow the [Code of Conduct](CODE_OF_CONDUCT.md) when participating.
 - Report vulnerabilities according to [SECURITY.md](SECURITY.md), not in a public issue.
 - Cite the project with [CITATION.cff](CITATION.cff).
 - See [CHANGELOG.md](CHANGELOG.md) for release history.

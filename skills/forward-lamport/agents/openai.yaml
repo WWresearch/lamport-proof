@@ -1,4 +1,4 @@
 interface:
-  display_name: "Audit Lamport Proof"
+  display_name: "Forward Lamport Audit"
   short_description: "Check hierarchical proof scope and validity"
-  default_prompt: "Use $audit-lamport-proof to check whether this hierarchical proof establishes its theorem with valid scope and construct use."
+  default_prompt: "Use $forward-lamport to check whether this hierarchical proof establishes its theorem with valid scope and construct use."

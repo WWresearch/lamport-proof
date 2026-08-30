@@ -27,6 +27,7 @@ class RepositoryCheckTests(unittest.TestCase):
         for filename in (
             "CHANGELOG.md",
             "CITATION.cff",
+            "CODE_OF_CONDUCT.md",
             "CONTRIBUTING.md",
             "LICENSE",
             "PROVENANCE.md",
@@ -126,6 +127,7 @@ class RepositoryCheckTests(unittest.TestCase):
     def test_required_public_docs_evals_and_staging_script_are_enforced(self) -> None:
         for relative in (
             ".github/ISSUE_TEMPLATE/bug.yml",
+            "CODE_OF_CONDUCT.md",
             "CONTRIBUTING.md",
             "SECURITY.md",
             "evals/README.md",
@@ -134,10 +136,78 @@ class RepositoryCheckTests(unittest.TestCase):
             (self.root / relative).unlink()
         errors = "\n".join(self.inspect_fixture())
         self.assertIn("missing required file .github/ISSUE_TEMPLATE/bug.yml", errors)
+        self.assertIn("missing required file CODE_OF_CONDUCT.md", errors)
         self.assertIn("missing required file CONTRIBUTING.md", errors)
         self.assertIn("missing required file SECURITY.md", errors)
         self.assertIn("missing required file evals/README.md", errors)
         self.assertIn("missing required file scripts/stage_isolated_skills.py", errors)
+
+    def test_exact_public_description_is_enforced_across_surfaces(self) -> None:
+        manifest_path = self.root / ".codex-plugin/plugin.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["description"] = "A vague proof toolkit."
+        manifest_path.write_text(
+            json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+
+        readme = self.root / "README.md"
+        readme.write_text(
+            readme.read_text(encoding="utf-8").replace(
+                check_repository.EXPECTED_PUBLIC_DESCRIPTION,
+                "A vague proof toolkit.",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        citation = self.root / "CITATION.cff"
+        citation.write_text(
+            citation.read_text(encoding="utf-8").replace(
+                check_repository.EXPECTED_PUBLIC_DESCRIPTION,
+                "A vague proof toolkit.",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("manifest description must match the exact public description", errors)
+        self.assertIn(
+            "README.md must present the exact public description in its introduction",
+            errors,
+        )
+        self.assertIn("CITATION.cff abstract must match the exact public description", errors)
+
+    def test_code_of_conduct_links_are_enforced(self) -> None:
+        for filename in ("README.md", "CONTRIBUTING.md"):
+            path = self.root / filename
+            path.write_text(
+                path.read_text(encoding="utf-8").replace(
+                    check_repository.EXPECTED_CODE_OF_CONDUCT_LINK,
+                    "Code of Conduct",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("README.md must link to CODE_OF_CONDUCT.md", errors)
+        self.assertIn("CONTRIBUTING.md must link to CODE_OF_CONDUCT.md", errors)
+
+    def test_code_of_conduct_identity_and_contact_are_enforced(self) -> None:
+        conduct = self.root / "CODE_OF_CONDUCT.md"
+        conduct.write_text(
+            conduct.read_text(encoding="utf-8")
+            .replace(check_repository.EXPECTED_CONTRIBUTOR_COVENANT_URL, "https://example.invalid")
+            .replace(check_repository.EXPECTED_CONTACT, "[INSERT CONTACT METHOD]"),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("CODE_OF_CONDUCT.md must identify Contributor Covenant 2.1", errors)
+        self.assertIn("CODE_OF_CONDUCT.md must provide the project reporting contact", errors)
+        self.assertIn("CODE_OF_CONDUCT.md contains an unresolved reporting placeholder", errors)
 
     def test_missing_openai_agent_fails(self) -> None:
         (self.root / "skills/forward-lamport/agents/openai.yaml").unlink()
@@ -175,6 +245,37 @@ class RepositoryCheckTests(unittest.TestCase):
         self.assertIn("convert-lamport must preserve contract invariant", errors)
         self.assertIn("reverse-lamport must preserve contract invariant", errors)
         self.assertIn("forward-lamport must preserve contract invariant", errors)
+
+    def test_converter_mapping_boundary_is_enforced(self) -> None:
+        convert = self.root / "skills/convert-lamport/SKILL.md"
+        convert.write_text(
+            convert.read_text(encoding="utf-8").replace(
+                "Do not let `STRUCTURAL` absorb source-content normalization",
+                "Classify the resulting content and structural rows",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn(
+            "Do not let `STRUCTURAL` absorb source-content normalization",
+            errors,
+        )
+
+    def test_converter_no_proof_boundary_is_enforced(self) -> None:
+        convert = self.root / "skills/convert-lamport/SKILL.md"
+        convert.write_text(
+            convert.read_text(encoding="utf-8").replace(
+                "`NOT SOURCE-MAPPABLE` is a pre-rendering stop",
+                "`NOT SOURCE-MAPPABLE` ends conversion",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("`NOT SOURCE-MAPPABLE` is a pre-rendering stop", errors)
 
     def test_eval_duplicate_case_id_fails(self) -> None:
         manifest = self.read_eval_manifest()

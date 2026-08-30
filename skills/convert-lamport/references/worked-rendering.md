@@ -52,6 +52,7 @@ PROOF.
 
 | Rendered step / item | Source ID(s) | Mapping kind | Source support | Issue ID | Notes |
 | --- | --- | --- | --- | --- | --- |
+| Frozen theorem contract | Theorem statement | `NORMALIZED` | `EXPLICIT` | — | Normalizes “for every real number `x`” as `x \in \mathbb{R}` without changing the proposition. |
 | `⟨1⟩1` | `SRC-001` | `DIRECT` | `OPEN` | `GAP-001` | The assertion is explicit; its proof is not supplied. |
 | Proof obligation at `⟨1⟩1` | `SRC-001` | `OBLIGATION` | `OPEN` | `GAP-001` | Required support is exposed, not invented. |
 | `⟨1⟩2` | `SRC-002` | `NORMALIZED` | `EXPLICIT` | — | Normalizes “adding 1” into the displayed inequality. |

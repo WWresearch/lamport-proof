@@ -1,5 +1,8 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Code of Conduct reports
+    url: https://github.com/WWresearch/lamport-proof/blob/main/CODE_OF_CONDUCT.md
+    about: Report conduct concerns privately according to the Code of Conduct.
   - name: Security reports
     url: https://github.com/WWresearch/lamport-proof/blob/main/SECURITY.md
     about: Report suspected vulnerabilities privately according to the security policy.

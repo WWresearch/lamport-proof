@@ -1,7 +1,7 @@
 {
   "name": "lamport-proof",
   "version": "0.2.0",
-  "description": "Convert existing proofs into source-mapped Lamport style and audit them forward or from their conclusion.",
+  "description": "Convert existing mathematical proofs into traceable Lamport-style hierarchies and audit the reasoning forward and backward.",
   "author": {
     "name": "Wojciech Aleksander Wołoszyn (WWresearch)",
     "email": "contact@wwresearch.org",

@@ -24,6 +24,14 @@ EXPECTED_DEVELOPER = "WWresearch"
 EXPECTED_WEBSITE = "https://www.wwresearch.org/"
 EXPECTED_REPOSITORY = "https://github.com/WWresearch/lamport-proof"
 EXPECTED_PLUGIN_NAME = "lamport-proof"
+EXPECTED_PUBLIC_DESCRIPTION = (
+    "Convert existing mathematical proofs into traceable Lamport-style "
+    "hierarchies and audit the reasoning forward and backward."
+)
+EXPECTED_CODE_OF_CONDUCT_LINK = "[Code of Conduct](CODE_OF_CONDUCT.md)"
+EXPECTED_CONTRIBUTOR_COVENANT_URL = (
+    "https://www.contributor-covenant.org/version/2/1/code_of_conduct.html"
+)
 SKILL_ORDER = ("convert-lamport", "forward-lamport", "reverse-lamport")
 EXPECTED_SKILLS = frozenset(SKILL_ORDER)
 EXPECTED_EVAL_CASES = frozenset(
@@ -74,6 +82,7 @@ REQUIRED_ROOT_FILES = (
     ".github/workflows/ci.yml",
     "CHANGELOG.md",
     "CITATION.cff",
+    "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
     "LICENSE",
     "PROVENANCE.md",
@@ -310,6 +319,8 @@ def inspect_manifest(root: Path, errors: list[str]) -> None:
         errors.append(f"manifest name must be {EXPECTED_PLUGIN_NAME!r}")
     if manifest.get("version") != EXPECTED_VERSION:
         errors.append(f"manifest version must be {EXPECTED_VERSION!r}")
+    if manifest.get("description") != EXPECTED_PUBLIC_DESCRIPTION:
+        errors.append("manifest description must match the exact public description")
     if manifest.get("repository") != EXPECTED_REPOSITORY:
         errors.append(f"manifest repository must be {EXPECTED_REPOSITORY!r}")
     if manifest.get("skills") != "./skills/":
@@ -388,10 +399,57 @@ def inspect_required_files(root: Path, errors: list[str]) -> None:
         except (OSError, UnicodeDecodeError) as error:
             errors.append(f"cannot read README.md as UTF-8: {error}")
         else:
+            if EXPECTED_PUBLIC_DESCRIPTION not in readme_text.splitlines()[:20]:
+                errors.append(
+                    "README.md must present the exact public description in its introduction"
+                )
+            if EXPECTED_CODE_OF_CONDUCT_LINK not in readme_text:
+                errors.append("README.md must link to CODE_OF_CONDUCT.md")
             if "`NOT SOURCE-MAPPABLE` stops the workflow" not in readme_text:
                 errors.append("README.md must document the NOT SOURCE-MAPPABLE stop rule")
             if "`PARTIALLY SOURCE-MAPPED`" not in readme_text or "exact defensible rendering" not in readme_text:
                 errors.append("README.md must document the partial-rendering audit boundary")
+
+    contributing_path = root / "CONTRIBUTING.md"
+    if contributing_path.is_file():
+        try:
+            contributing_text = contributing_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            errors.append(f"cannot read CONTRIBUTING.md as UTF-8: {error}")
+        else:
+            if EXPECTED_CODE_OF_CONDUCT_LINK not in contributing_text:
+                errors.append("CONTRIBUTING.md must link to CODE_OF_CONDUCT.md")
+
+    citation_path = root / "CITATION.cff"
+    if citation_path.is_file():
+        try:
+            citation_text = citation_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            errors.append(f"cannot read CITATION.cff as UTF-8: {error}")
+        else:
+            abstract_lines = [
+                line for line in citation_text.splitlines() if line.startswith("abstract:")
+            ]
+            expected_abstract = f'abstract: "{EXPECTED_PUBLIC_DESCRIPTION}"'
+            if abstract_lines != [expected_abstract]:
+                errors.append("CITATION.cff abstract must match the exact public description")
+
+    conduct_path = root / "CODE_OF_CONDUCT.md"
+    if conduct_path.is_file():
+        try:
+            conduct_text = conduct_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            errors.append(f"cannot read CODE_OF_CONDUCT.md as UTF-8: {error}")
+        else:
+            if (
+                "# Contributor Covenant Code of Conduct" not in conduct_text
+                or EXPECTED_CONTRIBUTOR_COVENANT_URL not in conduct_text
+            ):
+                errors.append("CODE_OF_CONDUCT.md must identify Contributor Covenant 2.1")
+            if EXPECTED_CONTACT not in conduct_text:
+                errors.append("CODE_OF_CONDUCT.md must provide the project reporting contact")
+            if "[INSERT CONTACT METHOD]" in conduct_text:
+                errors.append("CODE_OF_CONDUCT.md contains an unresolved reporting placeholder")
 
 
 def discover_skill_directories(root: Path, errors: list[str]) -> dict[str, Path]:
@@ -494,6 +552,8 @@ def inspect_skill_wiring(root: Path, skills: dict[str, Path], errors: list[str])
         "one identifier per underlying source-support defect",
         "accepted primitives explicitly supplied",
         "For `NOT SOURCE-MAPPABLE`, stop",
+        "`NOT SOURCE-MAPPABLE` is a pre-rendering stop",
+        "Do not let `STRUCTURAL` absorb source-content normalization",
     )
     for invariant in convert_invariants:
         if convert and invariant not in convert:

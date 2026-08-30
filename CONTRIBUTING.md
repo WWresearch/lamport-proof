@@ -2,6 +2,8 @@
 
 Thank you for helping improve Lamport Proof. Contributions should make the three skill contracts clearer, more reliable, or easier to evaluate without overstating what a model-assisted proof review establishes.
 
+Participation is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Project boundaries
 
 The public interfaces are `$convert-lamport`, `$forward-lamport`, and `$reverse-lamport`.

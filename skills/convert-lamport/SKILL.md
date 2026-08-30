@@ -38,7 +38,7 @@ Conversion status is independent of audit verdicts. `SOURCE-MAPPED` does not imp
 
 Use the exact theorem statement, the submitted proof text, any definitions or cited material that the user places in scope, and the accepted primitives explicitly supplied for the task. Never infer a broad background theory from the subject area or from a word such as “standard.”
 
-If the theorem or proof is absent, do not supply one from general knowledge. Return `NOT SOURCE-MAPPABLE` and identify what is missing. If part of the proof is usable, convert the usable material and expose the remainder through the status and issue register.
+If the theorem or proof is absent, do not supply one from general knowledge. Return `NOT SOURCE-MAPPABLE` and identify the missing input. `NOT SOURCE-MAPPABLE` is a pre-rendering stop: missing required input is a source-boundary condition, not an `OPEN` proof obligation inside a submitted route. Do not assign the absence an `OBLIGATION`, source-support status, issue identifier, or register entry. If part of a submitted proof route is usable, convert that material and expose defects within that route through the status and issue register instead.
 
 ## Conversion model
 
@@ -62,6 +62,8 @@ Assign each source-to-step ledger row exactly one mapping kind:
 - `OBLIGATION` — A placeholder records support that the source route requires but does not provide. It is not a supplied proof step and must not be presented as one.
 
 `STRUCTURAL` permits only organizational scaffolding. It cannot introduce a new mathematical bridge. When a proposed parent-child relationship would itself assert an unstated implication, record an `OBLIGATION` instead.
+
+Classify mathematical content separately from organizational scaffolding. Include the rendered theorem contract in this accounting. When `DIRECT` and `NORMALIZED` both seem plausible, use `NORMALIZED` if the rendering standardizes the source's notation or syntax; reserve `DIRECT` for content whose source form is closely retained. If one source item both undergoes such normalization and motivates a Lamport construct, use separate ledger rows: `NORMALIZED` for the unchanged proposition and `STRUCTURAL` for the construct. Do not let `STRUCTURAL` absorb source-content normalization.
 
 ### Source-support statuses
 
@@ -143,8 +145,9 @@ Existing unambiguous Lamport labels and scopes should remain unchanged. Otherwis
 
 Account for both directions:
 
+- the rendered theorem contract maps to the source theorem, including any `NORMALIZED` change in notation or syntax;
 - every `SRC-...` segment maps to at least one rendered step, register item, or explicit statement that it is purely expository;
-- every rendered mathematical assertion maps to at least one `SRC-...` segment or an identified `OBLIGATION`;
+- every rendered mathematical assertion maps to the source theorem, at least one `SRC-...` segment, or an identified `OBLIGATION`;
 - every `STRUCTURAL` step lists the source segments whose organization it exposes;
 - no obligation is counted as source-supplied evidence.
 
@@ -179,7 +182,9 @@ Gate the handoff by conversion status:
 
 ## Output format
 
-Produce the conversion in this order.
+For `SOURCE-MAPPED` and `PARTIALLY SOURCE-MAPPED`, produce the seven sections below in order.
+
+For `NOT SOURCE-MAPPABLE`, the seven-section template does not apply. Produce only the rendering status, the exact supplied source boundary and missing required input, and a stop statement that no Lamport hierarchy or auditable rendering was produced. Do not create a source inventory, hierarchy, mapping ledger, mapping kinds, source-support statuses, issue identifiers, or gap and ambiguity register when no defensible proof rendering exists.
 
 ### 1. Rendering status
 

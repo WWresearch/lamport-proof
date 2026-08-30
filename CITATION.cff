@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use Lamport Proof, please cite it using this metadata."
+type: software
+title: "Lamport Proof"
+abstract: "Convert existing mathematical proofs into traceable Lamport-style hierarchies and audit the reasoning forward and backward."
+authors:
+  - family-names: "Wołoszyn"
+    given-names: "Wojciech Aleksander"
+    affiliation: "WWresearch"
+    email: "contact@wwresearch.org"
+version: "0.2.0"
+date-released: "2026-08-31"
+repository-code: "https://github.com/WWresearch/lamport-proof"
+url: "https://www.wwresearch.org/"
+license: MIT
+keywords:
+  - "Codex skills"
+  - "mathematical proofs"
+  - "hierarchical proofs"
+  - "proof audit"
+  - "proof obligations"

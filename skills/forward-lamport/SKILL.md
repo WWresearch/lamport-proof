@@ -1,9 +1,9 @@
 ---
-name: audit-lamport-proof
-description: Audit an existing standard Leslie Lamport-style hierarchical mathematical proof for validity and whether its hierarchy, scope, dependencies, side conditions, and proof constructs discharge the stated theorem. Use when the central question concerns a forward/top-down proof with numbered levels, subproofs, ASSUME/PROVE, SUFFICES, PICK, CASE, DEFINE, Q.E.D., or prose equivalents. For conclusion-first AND/OR obligation reconstruction, use reverse-lamport; when both audits are requested, apply this skill first. Do not use to generate or replace a proof, or to audit Lean, Coq, Isabelle, or other proof-assistant source.
+name: forward-lamport
+description: Audit an existing Lamport-style hierarchical mathematical proof forward for validity and whether its hierarchy, scope, dependencies, side conditions, and proof constructs discharge the stated theorem. Use when the central question concerns a top-down proof with numbered levels, subproofs, ASSUME/PROVE, SUFFICES, PICK, CASE, DEFINE, Q.E.D., or prose equivalents. For an ordinary proof that first needs source-preserving hierarchy, use convert-lamport; for conclusion-first AND/OR obligation reconstruction, use reverse-lamport. Do not use to generate or replace a proof, or to audit Lean, Coq, Isabelle, or other proof-assistant source.
 ---
 
-# Audit a Standard Lamport-Style Proof
+# Audit a Lamport-Style Proof Forward
 
 ## Mission
 
@@ -28,11 +28,12 @@ Do not:
 Choose the audit by its direction and object:
 
 - Use this skill when the submitted proof's hierarchy, local scopes, and Lamport constructs are part of the contract.
+- Use `$convert-lamport` first when an existing ordinary or loosely organized proof needs a source-mapped hierarchy. Conversion preserves gaps and is not evidence of validity.
 - Use `$reverse-lamport` when the requested product is a conclusion-first bounded AND/OR obligation graph or the main question is what the submitted proof's conclusion-reachable dependencies support, independent of Lamport formatting.
 
 When both audits are requested:
 
-1. Freeze one exact theorem contract, source boundary, and set of accepted primitives.
+1. Freeze one exact theorem contract, source boundary, and set of accepted primitives. If `$convert-lamport` was used, also freeze its exact rendering, source-to-step ledger, and issue register; mapping annotations establish provenance only and are not proof premises.
 2. Run this forward audit first. Its step ledger records which assertions are established and legally visible.
 3. Run `$reverse-lamport` second from the exact conclusion. Use the forward ledger as evidence, but recheck the exact proposition and scope at every dependency edge.
 4. Report both verdicts under separate headings; do not convert one verdict mechanically into the other.
@@ -47,7 +48,7 @@ For a complete audit, require:
 2. the complete structured proof;
 3. definitions or conventions that are not standard in the stated domain.
 
-External lemmas and citations may be supplied separately. If a cited result is unavailable, continue the audit conditionally and record the exact external obligation. Do not silently accept “well known,” “standard,” or “by a theorem” when the missing statement could contain relevant hypotheses.
+External lemmas and citations may be supplied separately. If a cited result is unavailable, continue the audit conditionally and record the exact meta-obligation to obtain its statement and verify that its hypotheses and conclusion justify the affected step. Do not reconstruct unknown theorem content or silently accept “well known,” “standard,” or “by a theorem” when the missing statement could contain relevant hypotheses.
 
 If a partial proof is structurally readable, audit the supplied portion, mark omitted or admitted dependencies `CONDITIONAL`, and use `INCOMPLETE` unless a separately demonstrated defect requires `FAIL`. Ask for clarification only when the theorem or proof is missing or unreadable, or when an essential nonstandard definition prevents a conservative interpretation. Otherwise make explicit, conservative assumptions and label them.
 
@@ -213,6 +214,8 @@ Use exactly one overall verdict:
 - **FAIL** — A demonstrated critical defect or unresolved internal major obligation prevents the submitted proof from establishing the theorem. Prefer `FAIL` over `INCOMPLETE` when both conditions occur.
 - **NOT AUDITABLE** — The theorem or proof is missing, unreadable, or too incomplete to reconstruct a proof tree.
 
+Use `INCOMPLETE` only when the proof identifies particular external, admitted, or deliberately omitted support that could still discharge the affected steps if supplied. A silently unsupported internal assertion or construct obligation with no identified potentially discharging source—such as an unproved `PICK` existence claim, case coverage claim, or scope bridge—is a `MAJOR` internal defect and requires `FAIL`. Do not turn every absent argument into “omitted material”; prefer `FAIL` whenever the submitted route itself asserts or uses an unsupported internal obligation.
+
 Never call an informal audit “machine verified.” State the confidence boundary: the result is a structured mathematical audit, not a kernel-checked proof.
 
 ## Output format
@@ -259,7 +262,7 @@ For a very large proof, group the ledger by top-level step if helpful, but do no
 
 ### 6. Unresolved obligations
 
-State each missing lemma, citation, calculation, case, or scope clarification as an exact proposition to be proved or supplied. Say what downstream steps depend on it.
+State each missing calculation, case, scope clarification, or known lemma as an exact proposition to be proved or supplied. When a cited result's content is unavailable, state instead the exact meta-obligation to obtain its statement and check that it supplies the target under the visible hypotheses. Say what downstream steps depend on every unresolved item.
 
 ### 7. Minimal repair plan
 
