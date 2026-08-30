@@ -1,24 +1,28 @@
 {
-  "name": "lamport-proof-toolkit",
-  "version": "0.1.0",
-  "description": "Audit Lamport-style proof hierarchies and separately trace conclusion-first obligation graphs.",
+  "name": "lamport-proof",
+  "version": "0.2.0",
+  "description": "Convert existing proofs into source-mapped Lamport style and audit them forward or from their conclusion.",
   "author": {
     "name": "Wojciech Aleksander Wołoszyn (WWresearch)",
+    "email": "contact@wwresearch.org",
     "url": "https://www.wwresearch.org/"
   },
   "homepage": "https://www.wwresearch.org/",
+  "repository": "https://github.com/WWresearch/lamport-proof",
   "license": "MIT",
   "keywords": [
     "mathematical-proof",
     "lamport-proof",
+    "proof-conversion",
     "proof-audit",
-    "proof-obligations"
+    "proof-obligations",
+    "hierarchical-proof"
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Lamport Proof Toolkit",
-    "shortDescription": "Audit proof structure and conclusion obligations",
-    "longDescription": "Check an existing Lamport-style hierarchical proof forward for valid scope and construct discharge, or use the WWresearch reverse audit to trace its conclusion as a bounded AND/OR obligation graph. The reverse audit is not a method authored or endorsed by Leslie Lamport.",
+    "displayName": "Lamport Proof",
+    "shortDescription": "Convert and audit structured mathematical proofs",
+    "longDescription": "Convert an existing proof into a source-mapped Lamport-style hierarchy without filling gaps, audit that hierarchy forward, or trace its conclusion backward as a bounded AND/OR obligation graph. The reverse audit is an independent WWresearch method, not authored or endorsed by Leslie Lamport. Outputs are structured model-assisted reviews, not formal-verification certificates.",
     "developerName": "WWresearch",
     "category": "Research",
     "websiteURL": "https://www.wwresearch.org/",
@@ -27,9 +31,9 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Audit this hierarchical Lamport proof for scope and validity.",
-      "Trace this proof backward as an AND/OR obligation graph.",
-      "Run both Lamport audits and keep their verdicts separate."
+      "Convert this proof into source-mapped Lamport style without filling gaps.",
+      "Audit this Lamport-style proof forward for scope and validity.",
+      "Trace this proof backward as a bounded obligation graph."
     ]
   }
 }

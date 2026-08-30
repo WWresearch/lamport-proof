@@ -1,6 +1,6 @@
 ---
 name: reverse-lamport
-description: Audit an existing mathematical, logical, algorithmic, or technical proof from its stated conclusion backward as a bounded AND/OR graph of exact obligations. Use to reconstruct conclusion dependencies, determine whether a proof-supplied route establishes the conclusion, or expose hidden assumptions, unmet side conditions, cycles, overly strong steps, or silent route switches. For standard Lamport hierarchy, construct, and scope conformance, use audit-lamport-proof; when both audits are requested, apply it first and this skill second. This does not decide full theorem-level entailment by searching for a different proof; do not turn the audit into a linear reversed proof, exhaustive proof search, or replacement proof.
+description: Audit an existing mathematical, logical, algorithmic, or technical proof from its stated conclusion backward as a bounded AND/OR graph of exact obligations. Use to reconstruct conclusion dependencies, determine whether a proof-supplied route establishes the conclusion, or expose hidden assumptions, unmet side conditions, cycles, overly strong steps, or silent route switches. For a source-mapped Lamport rendering use convert-lamport, and for forward hierarchy, construct, and scope conformance use forward-lamport before this skill. This does not decide full theorem-level entailment by searching for a different proof; do not turn the audit into a linear reversed proof, exhaustive proof search, or replacement proof.
 ---
 
 # Audit Proofs with Reverse Lamport
@@ -12,14 +12,17 @@ Start at the stated conclusion and ask what must be true for each major claim to
 Choose the audit by its direction and object:
 
 - Use this skill when the requested product is a conclusion-first bounded AND/OR obligation graph or the main question is what the submitted proof's conclusion-reachable dependencies support.
-- Use `$audit-lamport-proof` when the submitted proof's forward hierarchy, local scopes, and Lamport constructs are part of the contract.
+- Use `$convert-lamport` when an existing ordinary or loosely organized proof first needs a source-mapped Lamport-style rendering. Conversion is optional when this conclusion-first audit is requested directly.
+- Use `$forward-lamport` when the submitted proof's forward hierarchy, local scopes, and Lamport constructs are part of the contract.
 
 When both audits are requested:
 
-1. Freeze one exact theorem contract, source boundary, and set of accepted primitives.
-2. Run `$audit-lamport-proof` first to establish the forward step ledger and legal visibility of assertions.
+1. Freeze one exact theorem contract, source boundary, and set of accepted primitives. If `$convert-lamport` was used, freeze its exact rendering, source-to-step ledger, and issue register; mapping annotations establish provenance only and are not proof premises.
+2. Run `$forward-lamport` first to establish the forward step ledger and legal visibility of assertions.
 3. Run this skill second from the exact conclusion. Use the forward ledger as evidence, but recheck the exact proposition and scope at every dependency edge.
 4. Report both verdicts under separate headings; do not convert one verdict mechanically into the other.
+
+When consuming a forward step ledger, an `OK` or `MINOR` step may support an edge only after its exact proposition and visibility are rechecked. A `CONDITIONAL` step leaves the corresponding reverse obligation `open`. A `MAJOR` or `CRITICAL` step is failing support and cannot introduce a witness or discharge an edge. These step-status rules govern the handoff; do not mechanically derive a reverse verdict from the overall forward verdict.
 
 The forward verdict is the **proof-establishment axis**: whether the submitted hierarchical proof discharges the theorem with valid construct and scope use. This skill's verdict is the **proof-route support axis**: whether a conclusion-reachable route supplied by the proof closes, merely fails to establish the conclusion, or supports a non-entailment verdict by counterexample or decisive non-entailment argument. `NOT ESTABLISHED BY THIS PROOF` does not by itself show that the conclusion is false or that no different proof exists.
 
@@ -73,6 +76,7 @@ Assign each obligation exactly one primary classification and a separate status.
 | `proved earlier` | An independent earlier result in the audited material proves the obligation. Link its claim node. |
 | `definition` | The step is a direct unfolding, expansion, or use of a stated definition. |
 | `named theorem` | A specifically identified theorem supplies the inference. List and check every applicability condition. |
+| `unavailable support` | The proof identifies a particular internal derivation, admitted step, or omitted proof text that could discharge the obligation, but its content is not available for checking. Use status `open`; do not use this when the support is demonstrated false or absent. |
 | `algebraic/logical step` | A local algebraic, order-theoretic, or logical inference is valid once its premises and side conditions are explicit. |
 | `side condition` | The obligation controls applicability or well-definedness, such as nonzeroness, domain membership, regularity, convergence, measurability, exhaustiveness, or freshness. |
 | `missing` | No stated hypothesis, earlier proof, definition, accepted theorem, or valid elementary step supplies the required proposition. |
@@ -82,7 +86,7 @@ Assign each obligation exactly one primary classification and a separate status.
 
 Use statuses `discharged`, `open`, `failing`, or `diagnostic only`. Treat `missing`, `circular`, `too strong`, and an unbridged `route switch` as failing on a proof-supplied route. A `side condition` may be discharged or may depend on a separate `missing` node; do not hide an unsupported side condition in prose or give one node two classifications. A diagnostic-only route never counts as support.
 
-Do not classify a named theorem by name alone. Record the exact implication being invoked and its premises. If the statement or applicability of the theorem cannot be established from the supplied material or accepted background, leave the relevant obligation open or missing instead of hallucinating support.
+Do not classify a named theorem by name alone. When its statement is available, record the exact implication being invoked and every premise. When the proof identifies a theorem but its exact statement or applicability is unavailable, state the exact meta-obligation—obtain that theorem statement and verify that its hypotheses and conclusion supply the target edge—without inventing its content. Classify the invoked support as `named theorem` with status `open` unless the supplied material independently demonstrates failure. Unavailability alone is not `missing` and must not force a failing route. Reserve `missing` for an exact required proposition for which the supplied route identifies no potentially discharging source, or for support shown to be absent rather than merely unavailable.
 
 ## 4. Bound, merge, and check the graph
 
@@ -122,7 +126,7 @@ Present the result in this order:
    | ID | Exact claim or obligation | Needed by | Route / edge | Classification | Support | Status |
    | --- | --- | --- | --- | --- | --- | --- |
 
-   Use `root` or `major claim` in place of a classification only for claim nodes; every obligation node must use one of the ten required classifications.
+   Use `root` or `major claim` in place of a classification only for claim nodes; every obligation node must use one of the eleven required classifications.
 5. **Verdict:** place the verdict after the table and make it the final section.
 
 Choose the verdict carefully:

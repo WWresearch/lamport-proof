@@ -1,4 +1,4 @@
 interface:
-  display_name: "Reverse Lamport Proof Audit"
+  display_name: "Reverse Lamport Audit"
   short_description: "Trace conclusion-first proof obligations"
   default_prompt: "Use $reverse-lamport to trace this proof from its conclusion as a bounded AND/OR obligation graph and give a verdict."
