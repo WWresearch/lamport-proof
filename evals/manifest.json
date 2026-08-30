@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "convert-forward-valid-export",
+      "prompt": "cases/convert-forward-valid-export.md",
+      "skills": ["convert-lamport", "forward-lamport"],
+      "expected": {
+        "conversion": {
+          "status": "SOURCE-MAPPED",
+          "mapping_kinds": ["DIRECT", "STRUCTURAL"],
+          "support_statuses": ["EXPLICIT", "IMPLICIT"],
+          "register_ids": []
+        },
+        "forward": "PASS"
+      },
+      "required_observations": [
+        {
+          "id": "implication-scope-preserved",
+          "description": "The rendering makes the assumption of A local and exports only the discharged implication."
+        },
+        {
+          "id": "complete-source-map",
+          "description": "Every proof-bearing sentence is represented in the source inventory and mapping ledger."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-extra-premises",
+          "description": "The conversion must not introduce a new mathematical premise or proof route."
+        }
+      ]
+    },
+    {
+      "id": "forward-private-substep",
+      "prompt": "cases/forward-private-substep.md",
+      "skills": ["forward-lamport"],
+      "expected": {"forward": "FAIL"},
+      "required_observations": [
+        {
+          "id": "private-step-invisible",
+          "description": "The audit identifies the cited child step B as unavailable in the sibling subproof even though A is freshly assumed there; B would have to be derived again."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-silent-repair",
+          "description": "The audit must not replace the invalid citation with a different proof of the theorem."
+        }
+      ]
+    },
+    {
+      "id": "convert-forward-unavailable-lemma",
+      "prompt": "cases/convert-forward-unavailable-lemma.md",
+      "skills": ["convert-lamport", "forward-lamport"],
+      "expected": {
+        "conversion": {
+          "status": "SOURCE-MAPPED",
+          "mapping_kinds": ["DIRECT", "OBLIGATION"],
+          "support_statuses": ["EXTERNAL UNAVAILABLE"],
+          "register_ids": ["EXT-001"]
+        },
+        "forward": "INCOMPLETE"
+      },
+      "required_observations": [
+        {
+          "id": "external-result-preserved",
+          "description": "The omitted lemma remains an unavailable external obligation with its source wording preserved."
+        },
+        {
+          "id": "conditional-external-handoff",
+          "description": "The affected forward-ledger row remains CONDITIONAL under an exact external meta-obligation, and no independent defect forces FAIL."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-remembered-lemma",
+          "description": "Neither skill may invent a statement or proof for the unavailable lemma from memory."
+        }
+      ]
+    },
+    {
+      "id": "reverse-valid-even-square",
+      "prompt": "cases/reverse-valid-even-square.md",
+      "skills": ["reverse-lamport"],
+      "expected": {"reverse": "FOLLOWS"},
+      "required_observations": [
+        {
+          "id": "witness-route-closes",
+          "description": "The graph traces the evenness witness through algebra and integer closure to a fully discharged conclusion route."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-unbounded-search",
+          "description": "The audit stays with the route supplied by the proof rather than searching for alternatives."
+        }
+      ]
+    },
+    {
+      "id": "reverse-false-sign-loss",
+      "prompt": "cases/reverse-false-sign-loss.md",
+      "skills": ["reverse-lamport"],
+      "expected": {"reverse": "DOES NOT FOLLOW FROM THE STATED ASSUMPTIONS"},
+      "required_observations": [
+        {
+          "id": "negative-counterexample",
+          "description": "The audit identifies the lost negative branch and uses n = -1 as a decisive counterexample."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-proof-only-verdict",
+          "description": "The audit must not stop at a defective-proof verdict after establishing a counterexample to the theorem."
+        }
+      ]
+    },
+    {
+      "id": "reverse-circular-identity",
+      "prompt": "cases/reverse-circular-identity.md",
+      "skills": ["reverse-lamport"],
+      "expected": {"reverse": "NOT ESTABLISHED BY THIS PROOF"},
+      "required_observations": [
+        {
+          "id": "cycle-preserved",
+          "description": "The obligation graph exposes the two-claim cycle and distinguishes a true conclusion from a proof-supplied route that does not close."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-substitute-algebra",
+          "description": "The audit must not replace the circular submission with the familiar algebraic expansion proof."
+        }
+      ]
+    },
+    {
+      "id": "reverse-unavailable-theorem",
+      "prompt": "cases/reverse-unavailable-theorem.md",
+      "skills": ["reverse-lamport"],
+      "expected": {"reverse": "INDETERMINATE FROM THE PROVIDED MATERIAL"},
+      "required_observations": [
+        {
+          "id": "unavailable-route-open",
+          "description": "The audit records the exact meta-obligation to obtain Theorem Z and check applicability; the named-theorem support remains open and could still close the route."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-imported-ivt",
+          "description": "The audit must not import a remembered intermediate value theorem statement from outside the declared source boundary."
+        }
+      ]
+    },
+    {
+      "id": "combined-unjustified-pick",
+      "prompt": "cases/combined-unjustified-pick.md",
+      "skills": ["convert-lamport", "forward-lamport", "reverse-lamport"],
+      "expected": {
+        "conversion": {
+          "status": "SOURCE-MAPPED",
+          "mapping_kinds": ["DIRECT", "STRUCTURAL", "OBLIGATION"],
+          "support_statuses": ["EXPLICIT", "OPEN"],
+          "register_ids": ["GAP-001"]
+        },
+        "forward": "FAIL",
+        "reverse": "NOT ESTABLISHED BY THIS PROOF"
+      },
+      "required_observations": [
+        {
+          "id": "existence-obligation-exposed",
+          "description": "The conversion exposes the unproved existence required by PICK instead of treating the chosen maximum as available."
+        },
+        {
+          "id": "axes-remain-separate",
+          "description": "The conversion status and both audit verdicts are reported independently against the frozen rendering."
+        },
+        {
+          "id": "failed-witness-handoff",
+          "description": "The reverse audit consumes the forward step ledger and keeps the failed PICK witness unavailable rather than reparsing it as established."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "mapping-is-not-evidence",
+          "description": "The mapping ledger or conversion status must not be used as proof of the missing existence claim."
+        },
+        {
+          "id": "no-induction-repair",
+          "description": "No induction or order-theoretic proof may be inserted to repair the submitted argument."
+        }
+      ]
+    },
+    {
+      "id": "convert-ambiguous-admitted-source",
+      "prompt": "cases/convert-ambiguous-admitted-source.md",
+      "skills": ["convert-lamport"],
+      "expected": {
+        "conversion": {
+          "status": "PARTIALLY SOURCE-MAPPED",
+          "mapping_kinds": ["DIRECT", "NORMALIZED", "OBLIGATION"],
+          "support_statuses": ["OPEN", "ADMITTED", "AMBIGUOUS"],
+          "register_ids": ["AMB-001", "GAP-001", "ADM-001"]
+        }
+      },
+      "required_observations": [
+        {
+          "id": "ambiguity-unresolved",
+          "description": "The illegible identifier remains ambiguous because selecting it would materially choose a proof route."
+        },
+        {
+          "id": "admission-retained",
+          "description": "The explicitly admitted product identity remains admitted in the rendering."
+        },
+        {
+          "id": "unsupported-zero-exposed",
+          "description": "The manuscript's unsupported assertion that the ambiguous identifier is zero remains an OPEN obligation."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-helpful-identifier-choice",
+          "description": "The converter must not choose the identifier that makes the proof work."
+        },
+        {
+          "id": "no-admission-removal",
+          "description": "The converter must not silently prove or delete the admitted identity."
+        }
+      ]
+    },
+    {
+      "id": "convert-no-proof",
+      "prompt": "cases/convert-no-proof.md",
+      "skills": ["convert-lamport"],
+      "expected": {
+        "conversion": {
+          "status": "NOT SOURCE-MAPPABLE",
+          "mapping_kinds": [],
+          "support_statuses": [],
+          "register_ids": []
+        }
+      },
+      "required_observations": [
+        {
+          "id": "theorem-boundary-reported",
+          "description": "The exact supplied theorem and absence of proof material are reported without manufacturing a hierarchy."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-trivial-proof-invention",
+          "description": "The converter must not invent a proof merely because the theorem is elementary."
+        }
+      ]
+    }
+  ]
+}
