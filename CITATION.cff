@@ -2,14 +2,14 @@ cff-version: 1.2.0
 message: "If you use Lamport Proof, please cite it using this metadata."
 type: software
 title: "Lamport Proof"
-abstract: "Inspect the reasoning in a proof you already have by making its hierarchy, dependencies, scope, and unresolved obligations explicit."
+abstract: "Make an existing proof easier to inspect by exposing its hierarchy, dependencies, scope, and unresolved obligations."
 authors:
   - family-names: "Wołoszyn"
     given-names: "Wojciech Aleksander"
     affiliation: "WWresearch"
     email: "contact@wwresearch.org"
 version: "0.2.0"
-date-released: "2026-09-06"
+date-released: "2026-09-07"
 repository-code: "https://github.com/WWresearch/lamport-proof"
 url: "https://www.wwresearch.org/"
 license: MIT

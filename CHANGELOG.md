@@ -4,7 +4,7 @@ All notable changes to Lamport Proof are documented in this file.
 
 The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The historical `v0.1.0` tag is retained under its original package identity.
 
-## [0.2.0] - 2026-09-06
+## [0.2.0] - 2026-09-07
 
 ### Added
 
@@ -41,4 +41,4 @@ The project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The
 - MIT licensing, authorship, provenance, and standalone repository checks.
 
 [0.2.0]: https://github.com/WWresearch/lamport-proof/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/WWresearch/lamport-proof/releases/tag/v0.1.0
+[0.1.0]: https://github.com/WWresearch/lamport-proof/tree/v0.1.0

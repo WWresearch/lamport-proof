@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/WWresearch/lamport-proof?display_name=tag)](https://github.com/WWresearch/lamport-proof/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Inspect the reasoning in a proof you already have by making its hierarchy, dependencies, scope, and unresolved obligations explicit.
+Make an existing proof easier to inspect by exposing its hierarchy, dependencies, scope, and unresolved obligations.
 
 Use `$convert-lamport` to organize a prose proof, `$forward-lamport` to check a hierarchy from assumptions to conclusion, and `$reverse-lamport` to trace the route from the conclusion back to its support. Use them separately or together.
 

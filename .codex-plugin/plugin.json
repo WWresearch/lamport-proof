@@ -1,7 +1,7 @@
 {
   "name": "lamport-proof",
   "version": "0.2.0",
-  "description": "Inspect the reasoning in a proof you already have by making its hierarchy, dependencies, scope, and unresolved obligations explicit.",
+  "description": "Make an existing proof easier to inspect by exposing its hierarchy, dependencies, scope, and unresolved obligations.",
   "author": {
     "name": "Wojciech Aleksander Wołoszyn (WWresearch)",
     "email": "contact@wwresearch.org",

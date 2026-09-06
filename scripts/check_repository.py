@@ -18,7 +18,7 @@ import unicodedata
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_VERSION = "0.2.0"
-EXPECTED_RELEASE_DATE = "2026-09-06"
+EXPECTED_RELEASE_DATE = "2026-09-07"
 EXPECTED_AUTHOR = "Wojciech Aleksander Wołoszyn (WWresearch)"
 EXPECTED_CONTACT = "contact@wwresearch.org"
 EXPECTED_DEVELOPER = "WWresearch"
@@ -26,8 +26,18 @@ EXPECTED_WEBSITE = "https://www.wwresearch.org/"
 EXPECTED_REPOSITORY = "https://github.com/WWresearch/lamport-proof"
 EXPECTED_PLUGIN_NAME = "lamport-proof"
 EXPECTED_PUBLIC_DESCRIPTION = (
-    "Inspect the reasoning in a proof you already have by making its hierarchy, "
-    "dependencies, scope, and unresolved obligations explicit."
+    "Make an existing proof easier to inspect by exposing its hierarchy, dependencies, "
+    "scope, and unresolved obligations."
+)
+EXPECTED_PRIVATE_REPORTING_LINK = (
+    "[GitHub private vulnerability reporting]"
+    "(https://github.com/WWresearch/lamport-proof/security/advisories/new)"
+)
+EXPECTED_SECURITY_EMAIL_LINK = (
+    "[contact@wwresearch.org](mailto:contact@wwresearch.org)"
+)
+EXPECTED_V010_TAG_LINK = (
+    "[0.1.0]: https://github.com/WWresearch/lamport-proof/tree/v0.1.0"
 )
 EXPECTED_ACKNOWLEDGMENT = (
     "Thanks to Bartosz Naskręcki for introducing the author to Leslie Lamport's "
@@ -473,6 +483,22 @@ def inspect_required_files(root: Path, errors: list[str]) -> None:
             if release_heading not in changelog_text.splitlines():
                 errors.append(
                     "CHANGELOG.md release heading must match the canonical release date"
+                )
+            if EXPECTED_V010_TAG_LINK not in changelog_text.splitlines():
+                errors.append("CHANGELOG.md must link version 0.1.0 to its Git tag")
+
+    security_path = root / "SECURITY.md"
+    if security_path.is_file():
+        try:
+            security_text = security_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            errors.append(f"cannot read SECURITY.md as UTF-8: {error}")
+        else:
+            if EXPECTED_SECURITY_EMAIL_LINK not in security_text:
+                errors.append("SECURITY.md must link the project reporting email")
+            if EXPECTED_PRIVATE_REPORTING_LINK not in security_text:
+                errors.append(
+                    "SECURITY.md must link GitHub private vulnerability reporting"
                 )
 
     workflow_path = root / ".github/workflows/ci.yml"

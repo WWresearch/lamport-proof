@@ -203,7 +203,7 @@ class RepositoryCheckTests(unittest.TestCase):
         )
 
         errors = "\n".join(self.inspect_fixture())
-        self.assertIn("CITATION.cff date-released must be '2026-09-06'", errors)
+        self.assertIn("CITATION.cff date-released must be '2026-09-07'", errors)
         self.assertIn(
             "CHANGELOG.md release heading must match the canonical release date",
             errors,
@@ -260,6 +260,41 @@ class RepositoryCheckTests(unittest.TestCase):
             errors,
         )
         self.assertIn("CITATION.cff abstract must match the exact public description", errors)
+
+    def test_public_reporting_channels_are_enforced(self) -> None:
+        security = self.root / "SECURITY.md"
+        security.write_text(
+            security.read_text(encoding="utf-8")
+            .replace(
+                check_repository.EXPECTED_SECURITY_EMAIL_LINK,
+                "contact@wwresearch.org",
+            )
+            .replace(
+                check_repository.EXPECTED_PRIVATE_REPORTING_LINK,
+                "public vulnerability reporting",
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("SECURITY.md must link the project reporting email", errors)
+        self.assertIn(
+            "SECURITY.md must link GitHub private vulnerability reporting",
+            errors,
+        )
+
+    def test_historical_tag_link_is_enforced(self) -> None:
+        changelog = self.root / "CHANGELOG.md"
+        changelog.write_text(
+            changelog.read_text(encoding="utf-8").replace(
+                check_repository.EXPECTED_V010_TAG_LINK,
+                "[0.1.0]: https://github.com/WWresearch/lamport-proof/releases/tag/v0.1.0",
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("CHANGELOG.md must link version 0.1.0 to its Git tag", errors)
 
     def test_code_of_conduct_links_are_enforced(self) -> None:
         for filename in ("README.md", "CONTRIBUTING.md"):

@@ -12,7 +12,12 @@ Support covers the repository's current skill instructions, helper scripts, vali
 
 ## Report a vulnerability
 
-Do not open a public issue for a suspected vulnerability. Email [contact@wwresearch.org](mailto:contact@wwresearch.org) with the subject `[lamport-proof security]` and include, when available:
+Do not open a public issue for a suspected vulnerability. Use either private channel:
+
+- [GitHub private vulnerability reporting](https://github.com/WWresearch/lamport-proof/security/advisories/new); or
+- email [contact@wwresearch.org](mailto:contact@wwresearch.org) with the subject `[lamport-proof security]`.
+
+Include, when available:
 
 - the affected version, commit, skill, or script;
 - the security impact and realistic attack conditions;
