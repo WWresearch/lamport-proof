@@ -65,6 +65,8 @@ Assign each source-to-step ledger row exactly one mapping kind:
 
 Classify mathematical content separately from organizational scaffolding. Include the rendered theorem contract in this accounting. When `DIRECT` and `NORMALIZED` both seem plausible, use `NORMALIZED` if the rendering standardizes the source's notation or syntax; reserve `DIRECT` for content whose source form is closely retained. If one source item both undergoes such normalization and motivates a Lamport construct, use separate ledger rows: `NORMALIZED` for the unchanged proposition and `STRUCTURAL` for the construct. Do not let `STRUCTURAL` absorb source-content normalization.
 
+Every nonclosed issue identifier must appear on at least one `OBLIGATION` ledger row. If the source also supplies the affected claim, citation, admission, or ambiguous wording, preserve that content on a separate `DIRECT` or `NORMALIZED` row; a source-content row does not replace the obligation row. Reuse the same issue identifier on the obligation row and wherever the same defect propagates.
+
 ### Source-support statuses
 
 Assign each rendered claim or obligation exactly one source-support status:
@@ -149,6 +151,7 @@ Account for both directions:
 - every `SRC-...` segment maps to at least one rendered step, register item, or explicit statement that it is purely expository;
 - every rendered mathematical assertion maps to the source theorem, at least one `SRC-...` segment, or an identified `OBLIGATION`;
 - every `STRUCTURAL` step lists the source segments whose organization it exposes;
+- every `GAP-...`, `AMB-...`, `EXT-...`, or `ADM-...` issue has an `OBLIGATION` row for the exact unresolved support or disambiguation task, separate from any row that preserves source-supplied content;
 - no obligation is counted as source-supplied evidence.
 
 The ledger must make duplicated, merged, split, normalized, and unplaced material visible.

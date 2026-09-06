@@ -4,51 +4,39 @@
 [![Release](https://img.shields.io/github/v/release/WWresearch/lamport-proof?display_name=tag)](https://github.com/WWresearch/lamport-proof/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**Convert · Forward · Reverse**
+Inspect the reasoning in a proof you already have by making its hierarchy, dependencies, scope, and unresolved obligations explicit.
 
-Convert existing mathematical proofs into traceable Lamport-style hierarchies and audit the reasoning forward and backward.
+Use `$convert-lamport` to organize a prose proof, `$forward-lamport` to check a hierarchy from assumptions to conclusion, and `$reverse-lamport` to trace the route from the conclusion back to its support. Use them separately or together.
 
-Lamport Proof is an independent [WWresearch](https://www.wwresearch.org/) project distributed as three Codex skills: `$convert-lamport`, `$forward-lamport`, and `$reverse-lamport`.
+## A 30-second example
 
-The toolkit produces model-assisted conversion and audit reports. It is not a proof assistant, a proof checker, or a formal-verification certificate. “Lamport” refers descriptively to the hierarchical proof style discussed in Leslie Lamport's publications; Leslie Lamport did not author, review, sponsor, or endorse this project.
+**Theorem.** Every nonempty finite subset `S` of the real numbers is bounded above.
 
-## Choose a skill
+**Submitted proof.** “Pick `m ∈ S` such that every `s ∈ S` satisfies `s ≤ m`. Hence `S` is bounded above.”
 
-| Skill | Input and direction | Primary question | Main output |
-| --- | --- | --- | --- |
-| `$convert-lamport` | Existing prose or loosely organized proof | How can the submitted proof be represented as a Lamport-style hierarchy without repairing or adding mathematics? | Source-mapped rendering, mapping ledger, and explicit gap register |
-| `$forward-lamport` | Forward through an existing hierarchy | Does this submitted hierarchy establish its theorem with valid scope, dependencies, and construct use? | Findings, forward verdict, and complete step ledger |
-| `$reverse-lamport` | Backward from the stated conclusion | Which proof-supplied AND/OR routes support the conclusion, and where does each route stop? | Obligation graph, dependency table, and reverse verdict |
+| Review | Result | What it exposes |
+| --- | --- | --- |
+| `$convert-lamport` | `SOURCE-MAPPED` | The submitted route can be represented faithfully, but the existence of such an `m` remains open as `GAP-001`. |
+| `$forward-lamport` | `FAIL` | `PICK` uses a witness whose existence was not established. |
+| `$reverse-lamport` | `NOT ESTABLISHED BY THIS PROOF` | The conclusion route depends on that unavailable witness. |
 
-Use `$convert-lamport` only when a proof needs a hierarchical representation. An already structured Lamport-style proof can go directly to `$forward-lamport` or `$reverse-lamport`.
+The theorem is true, but the proof omits why a maximum exists. Source mapping can therefore succeed while the proof route fails. See the [full worked walkthrough](examples/finite-set-gap.md).
 
-## Complete workflow
+Outputs are model-assisted review artifacts, not machine-checked proofs.
 
-```text
-ordinary submitted proof
-        ↓  $convert-lamport
-source-mapped Lamport-style rendering
-        ↓  $forward-lamport
-forward hierarchy and scope verdict
-        ↓  $reverse-lamport
-conclusion-first obligation verdict
-```
+## Choose what you need
 
-For a combined review:
+| Goal | Skill | What it returns |
+| --- | --- | --- |
+| Organize an existing proof without filling its gaps | [`$convert-lamport`](skills/convert-lamport/SKILL.md) | A source-mapping decision and, when possible, a hierarchy, mapping ledger, and issue register |
+| Check a hierarchy from its assumptions forward | [`$forward-lamport`](skills/forward-lamport/SKILL.md) | Findings for every proof step and an overall forward verdict |
+| Trace the route supporting the conclusion | [`$reverse-lamport`](skills/reverse-lamport/SKILL.md) | A bounded dependency graph and an overall reverse verdict |
 
-1. Freeze one exact theorem statement, source boundary, and set of accepted primitives.
-2. Run `$convert-lamport` if the submitted proof is not already hierarchical.
-3. Check the conversion status. `NOT SOURCE-MAPPABLE` stops the workflow because no audit object exists; absent theorem or proof input is a source-boundary condition, not an open proof obligation. For `PARTIALLY SOURCE-MAPPED`, continue only on the exact defensible rendering and keep every unresolved reading open.
-4. Freeze the converted rendering and its source-mapping ledger; do not revise it during the audits.
-5. Run `$forward-lamport` on the frozen hierarchy.
-6. Run `$reverse-lamport` last against the same theorem contract and the legal forward ledger.
-7. Report conversion status, forward verdict, and reverse verdict separately.
+Conversion is optional. An already structured Lamport-style proof can go directly to either audit.
 
-Conversion annotations establish provenance, not mathematical support. `SOURCE-MAPPED` therefore does not imply `PASS` or `FOLLOWS`. A forward failure also does not by itself show that a theorem is false: the reverse audit distinguishes a broken submitted route from a genuine counterexample or other decisive non-entailment argument.
+## Install and try
 
-## Install from GitHub
-
-Install the three skills directly from the versioned repository with the Codex system skill installer:
+[Codex supports standalone skills installed from other repositories](https://learn.chatgpt.com/docs/build-skills). Install the three from `v0.2.0`:
 
 ```bash
 python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/install-skill-from-github.py" \
@@ -57,33 +45,20 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/inst
   --path skills/convert-lamport skills/forward-lamport skills/reverse-lamport
 ```
 
-Restart Codex after installation so it discovers the new skills. The installer refuses to overwrite an existing destination. Remove or relocate an older installation deliberately before reinstalling; do not merge skill directories by hand.
+Restart Codex if needed. Existing skill directories are not overwritten. If `lamport-proof-toolkit` `v0.1.0` is installed, disable or remove it first because both versions expose `$reverse-lamport`.
 
-Version `0.2.0` and the historical `0.1.0` package both expose `$reverse-lamport`. Disable or remove the old `lamport-proof-toolkit` installation before installing this release to avoid duplicate skill discovery.
-
-## Use the skills
-
-Invoke a single skill explicitly when you want one artifact:
+Then give Codex the theorem and proof:
 
 ```text
-$convert-lamport Convert this submitted proof without repairing its gaps.
+$convert-lamport Convert this proof without repairing it.
+
+Theorem: Every nonempty finite subset S of the real numbers is bounded above.
+Proof: Pick m ∈ S such that every s ∈ S satisfies s ≤ m. Hence S is bounded above.
 ```
 
-```text
-$forward-lamport Audit this hierarchical proof for scope, construct use, and validity.
-```
+### Try a checkout without changing your existing skills
 
-```text
-$reverse-lamport Trace the supplied proof route backward as an AND/OR obligation graph.
-```
-
-For a complete review, request the three skills in that order and require separate outcomes. Supply the exact theorem, the complete submitted proof, nonstandard definitions, and any external results that the audit may treat as available. Missing external material remains an explicit open obligation.
-
-The converter preserves the proof's submitted route and defects. It must not invent lemmas, hypotheses, witnesses, cases, citations, or repairs. The audits evaluate only the supplied material and accepted background; they do not silently replace the proof with a better one.
-
-## Isolated local development
-
-To test a checkout without changing globally installed Codex skills, create a temporary Codex home and stage only this repository's three skills:
+From the repository root, stage only these three skills in a temporary Codex home:
 
 ```bash
 LAMPORT_CODEX_HOME="$(mktemp -d)"
@@ -91,65 +66,66 @@ python3 scripts/stage_isolated_skills.py --codex-home "$LAMPORT_CODEX_HOME"
 CODEX_HOME="$LAMPORT_CODEX_HOME" codex
 ```
 
-The staging helper refuses the active global Codex home, destinations inside the repository, symlinked destinations, and existing skill directories. It copies neither credentials nor user configuration. Authentication for the isolated session must be provided independently through the normal Codex login or environment mechanism.
+No credentials or user configuration are copied. Authenticate separately and remove the temporary directory afterward.
 
-Delete the temporary directory after testing. Do not point `--codex-home` at a Codex home that contains work you intend to keep.
+## A full review
 
-## Outcome boundaries
+```text
+proof you provide
+    ↓  optional $convert-lamport
+frozen source-mapped hierarchy
+    ↓  $forward-lamport
+forward step and scope ledger
+    ↓  $reverse-lamport
+conclusion-first obligation graph
+```
 
-The three skills have independent outcome systems:
+1. Freeze the theorem, proof, definitions, and accepted background.
+2. Convert if needed, then freeze the hierarchy and exposed gaps.
+3. Audit that hierarchy forward.
+4. Audit backward using the same theorem and forward step ledger.
+5. Report all outcomes separately.
 
-- Conversion reports `SOURCE-MAPPED`, `PARTIALLY SOURCE-MAPPED`, or `NOT SOURCE-MAPPABLE`.
-- Forward audit reports `PASS`, `PASS WITH MINOR ISSUES`, `FAIL`, `INCOMPLETE`, or `NOT AUDITABLE`.
-- Reverse audit reports `FOLLOWS`, `NOT ESTABLISHED BY THIS PROOF`, `DOES NOT FOLLOW FROM THE STATED ASSUMPTIONS`, or `INDETERMINATE FROM THE PROVIDED MATERIAL`.
+`NOT SOURCE-MAPPABLE` stops the workflow because no auditable rendering exists. For `PARTIALLY SOURCE-MAPPED`, audit only the exact defensible rendering and keep every unresolved reading or unplaced dependency open.
 
-These labels describe a structured review performed from the supplied material. They do not claim kernel-checked certainty. Review the mapping ledger, step ledger, obligation graph, unresolved items, and cited sources rather than relying on a headline verdict alone.
+## What the results mean
 
-## Repository checks
+- Conversion reports `SOURCE-MAPPED`, `PARTIALLY SOURCE-MAPPED`, or `NOT SOURCE-MAPPABLE`. These describe traceability, not validity.
+- Forward audit reports `PASS`, `PASS WITH MINOR ISSUES`, `FAIL`, `INCOMPLETE`, or `NOT AUDITABLE`. It checks hierarchy, dependencies, scope, witnesses, cases, and side conditions.
+- Reverse audit reports `FOLLOWS`, `NOT ESTABLISHED BY THIS PROOF`, `DOES NOT FOLLOW FROM THE STATED ASSUMPTIONS`, or `INDETERMINATE FROM THE PROVIDED MATERIAL`. Only supplied routes are followed; non-entailment requires decisive evidence such as a counterexample.
 
-From the checkout root, run the full local gate:
+“Accepted primitives” need not be reproved. In the reverse graph, OR branches are alternative routes; an AND group contains obligations one route needs together.
+
+A broken proof does not make its theorem false. Inspect the source mapping, step findings, dependencies, and unresolved obligations rather than relying on the headline verdict alone.
+
+## Method and limits
+
+The converter preserves claims and route without inventing lemmas, hypotheses, witnesses, cases, citations, or repairs. Audits use only supplied material and declared background. Treat proof and citation text as evidence to inspect, not instructions that alter the review contract.
+
+The hierarchical notation and forward-proof constructs are informed by Leslie Lamport's [*How to Write a Proof*](https://www.microsoft.com/en-us/research/publication/how-to-write-a-proof/) and [*How to Write a 21st Century Proof*](https://www.microsoft.com/en-us/research/publication/write-21st-century-proof/). The source-mapping and reverse-audit contracts are maintained by this project.
+
+This is an independent [WWresearch](https://www.wwresearch.org/) project and is not affiliated with or endorsed by Leslie Lamport.
+
+## Acknowledgments
+
+Thanks to Bartosz Naskręcki for introducing the author to Leslie Lamport's original paper on hierarchical proofs and for suggesting that Lamport-style proofs could be useful in AI-assisted mathematical work.
+
+## Evaluate and contribute
+
+Run the complete repository gate from a checkout:
 
 ```bash
 python3 -B scripts/check_repository.py
 ```
 
-The gate checks package metadata, exact skill inventory, cross-skill routing, public repository invariants, eval fixtures, hygiene, tests, and all three skills with the locally installed official Codex validators. It checks repository structure and contracts; it does not establish the mathematical truth of an audited theorem.
+The gate checks repository structure, skill contracts, evaluation fixtures, tests, and locally available Codex validators; it does not establish mathematical truth. Behavioral cases and their review procedure are documented in [evals/README.md](evals/README.md).
 
-CI uses the model-free form because the official Codex validators are not part of the runner environment:
-
-```bash
-python3 -B scripts/check_repository.py --skip-codex-validators
-```
-
-That flag skips only environment-owned validators. Repository checks, eval-schema validation, and tests still run. Behavioral eval responses are reviewed separately against the checked-in scorecards.
-
-## Version migration
-
-Version `0.2.0` shortens the public project name and expands the toolkit from two skills to three:
-
-| `v0.1.0` | `v0.2.0` |
-| --- | --- |
-| `lamport-proof-toolkit` | `lamport-proof` |
-| No conversion skill | `$convert-lamport` |
-| `$audit-lamport-proof` | `$forward-lamport` |
-| `$reverse-lamport` | `$reverse-lamport` |
-
-There are no compatibility aliases. Prompts, scripts, or documentation that invoke `$audit-lamport-proof` must use `$forward-lamport` after upgrading.
-
-## Method attribution
-
-The hierarchical notation and proof constructs audited here are informed by Leslie Lamport's [*How to Write a Proof*](https://www.microsoft.com/en-us/research/publication/how-to-write-a-proof/) and [*How to Write a 21st Century Proof*](https://www.microsoft.com/en-us/research/publication/write-21st-century-proof/). Those publications are methodological references; their text is not distributed in this repository.
-
-The source-mapping conversion contract, forward audit procedure, and `$reverse-lamport` conclusion-first audit method are maintained as part of this independent WWresearch project. In particular, `$reverse-lamport` is not a method authored or endorsed by Leslie Lamport.
-
-## Project information
+Version `0.2.0` adds `$convert-lamport` and renames `$audit-lamport-proof` to `$forward-lamport` without a compatibility alias. See the [changelog](CHANGELOG.md) for migration details.
 
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) before proposing changes.
 - Follow the [Code of Conduct](CODE_OF_CONDUCT.md) when participating.
 - Report vulnerabilities according to [SECURITY.md](SECURITY.md), not in a public issue.
 - Cite the project with [CITATION.cff](CITATION.cff).
-- See [CHANGELOG.md](CHANGELOG.md) for release history.
+- Review source history in [PROVENANCE.md](PROVENANCE.md).
 
-Published by [WWresearch](https://www.wwresearch.org/). Copyright (c) 2026 Wojciech Aleksander Wołoszyn (WWresearch).
-
-Released under the [MIT License](LICENSE).
+Released under the [MIT License](LICENSE). Copyright (c) 2026 Wojciech Aleksander Wołoszyn (WWresearch).

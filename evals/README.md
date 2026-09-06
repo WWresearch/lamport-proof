@@ -4,6 +4,8 @@ This corpus tests the observable contracts of `$convert-lamport`, `$forward-lamp
 
 Repository tests validate the corpus structure and coverage without invoking a model. They do not establish that a model satisfies the rubrics.
 
+The `v0.2.0` release gate contains 13 cases and 18 isolated generation stages. Each case also receives one fresh independent semantic review, for 13 review sessions in total.
+
 When scoring a response, require the declared conversion status and audit verdicts exactly. Treat `mapping_kinds` and `support_statuses` as required coverage signals: additional uses are acceptable only when they are source-faithful and contract-compliant. Treat `register_ids` as the complete expected issue set; an unexplained missing or additional issue fails the case. Every `required_observation` must be present semantically, and any `prohibited_claim` fails the case even when the headline outcome is correct.
 
 For a behavioral release check:

@@ -50,6 +50,50 @@
       ]
     },
     {
+      "id": "forward-minor-citation",
+      "prompt": "cases/forward-minor-citation.md",
+      "skills": ["forward-lamport"],
+      "expected": {"forward": "PASS WITH MINOR ISSUES"},
+      "required_observations": [
+        {
+          "id": "side-condition-established",
+          "description": "The audit confirms that the active theorem assumption x ≠ 0 supplies the side condition needed for cancellation, so no validity obligation remains open."
+        },
+        {
+          "id": "citation-specificity-minor",
+          "description": "The proof's failure to cite the active nonzero assumption in its cancellation justification is classified as a minor clarity issue."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-validity-failure",
+          "description": "The audit must not treat the denominator side condition as missing when x ≠ 0 is an active theorem assumption."
+        },
+        {
+          "id": "no-replacement-proof",
+          "description": "The audit must not replace the submitted hierarchy with a newly written proof."
+        }
+      ]
+    },
+    {
+      "id": "forward-no-proof",
+      "prompt": "cases/forward-no-proof.md",
+      "skills": ["forward-lamport"],
+      "expected": {"forward": "NOT AUDITABLE"},
+      "required_observations": [
+        {
+          "id": "missing-proof-reported",
+          "description": "The response identifies that an exact theorem is present but no hierarchical proof exists from which to reconstruct a proof tree."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-reflexivity-proof",
+          "description": "The audit must not manufacture a reflexivity proof or treat the theorem's truth as a submitted proof."
+        }
+      ]
+    },
+    {
       "id": "convert-forward-unavailable-lemma",
       "prompt": "cases/convert-forward-unavailable-lemma.md",
       "skills": ["convert-lamport", "forward-lamport"],
@@ -224,6 +268,44 @@
         {
           "id": "no-admission-removal",
           "description": "The converter must not silently prove or delete the admitted identity."
+        }
+      ]
+    },
+    {
+      "id": "convert-forward-partial-ambiguity",
+      "prompt": "cases/convert-forward-partial-ambiguity.md",
+      "skills": ["convert-lamport", "forward-lamport"],
+      "expected": {
+        "conversion": {
+          "status": "PARTIALLY SOURCE-MAPPED",
+          "mapping_kinds": ["DIRECT", "NORMALIZED", "OBLIGATION"],
+          "support_statuses": ["OPEN", "ADMITTED", "AMBIGUOUS"],
+          "register_ids": ["AMB-001", "GAP-001", "ADM-001"]
+        },
+        "forward": "FAIL"
+      },
+      "required_observations": [
+        {
+          "id": "partial-handoff-frozen",
+          "description": "The forward stage audits only the exact defensible partial rendering and preserves AMB-001 instead of reparsing or completing the source."
+        },
+        {
+          "id": "internal-gap-forces-fail",
+          "description": "The unsupported assertion that the ambiguous identifier is zero remains an internal major obligation, so FAIL takes precedence over the admitted dependency."
+        },
+        {
+          "id": "admission-propagated",
+          "description": "The forward ledger also retains the admitted product identity as conditional support rather than treating conversion metadata as proof."
+        }
+      ],
+      "prohibited_claims": [
+        {
+          "id": "no-helpful-reading",
+          "description": "Neither stage may choose v as the identifier merely because a = b would then make the argument work."
+        },
+        {
+          "id": "no-source-reimport",
+          "description": "The forward audit must not use the original prose or an independently reconstructed proof as an alternative to the frozen rendering."
         }
       ]
     },

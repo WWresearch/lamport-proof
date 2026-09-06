@@ -18,6 +18,7 @@ import unicodedata
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_VERSION = "0.2.0"
+EXPECTED_RELEASE_DATE = "2026-09-06"
 EXPECTED_AUTHOR = "Wojciech Aleksander Wołoszyn (WWresearch)"
 EXPECTED_CONTACT = "contact@wwresearch.org"
 EXPECTED_DEVELOPER = "WWresearch"
@@ -25,8 +26,13 @@ EXPECTED_WEBSITE = "https://www.wwresearch.org/"
 EXPECTED_REPOSITORY = "https://github.com/WWresearch/lamport-proof"
 EXPECTED_PLUGIN_NAME = "lamport-proof"
 EXPECTED_PUBLIC_DESCRIPTION = (
-    "Convert existing mathematical proofs into traceable Lamport-style "
-    "hierarchies and audit the reasoning forward and backward."
+    "Inspect the reasoning in a proof you already have by making its hierarchy, "
+    "dependencies, scope, and unresolved obligations explicit."
+)
+EXPECTED_ACKNOWLEDGMENT = (
+    "Thanks to Bartosz Naskręcki for introducing the author to Leslie Lamport's "
+    "original paper on hierarchical proofs and for suggesting that Lamport-style "
+    "proofs could be useful in AI-assisted mathematical work."
 )
 EXPECTED_CODE_OF_CONDUCT_LINK = "[Code of Conduct](CODE_OF_CONDUCT.md)"
 EXPECTED_CONTRIBUTOR_COVENANT_URL = (
@@ -38,9 +44,12 @@ EXPECTED_EVAL_CASES = frozenset(
     {
         "combined-unjustified-pick",
         "convert-ambiguous-admitted-source",
+        "convert-forward-partial-ambiguity",
         "convert-forward-unavailable-lemma",
         "convert-forward-valid-export",
         "convert-no-proof",
+        "forward-minor-citation",
+        "forward-no-proof",
         "forward-private-substep",
         "reverse-circular-identity",
         "reverse-false-sign-loss",
@@ -48,6 +57,7 @@ EXPECTED_EVAL_CASES = frozenset(
         "reverse-valid-even-square",
     }
 )
+EXPECTED_EVAL_GENERATION_STAGES = 18
 CONVERSION_STATUSES = frozenset(
     {"SOURCE-MAPPED", "PARTIALLY SOURCE-MAPPED", "NOT SOURCE-MAPPABLE"}
 )
@@ -90,12 +100,19 @@ REQUIRED_ROOT_FILES = (
     "SECURITY.md",
     "evals/README.md",
     "evals/manifest.json",
+    "examples/finite-set-gap.md",
     "scripts/check_repository.py",
     "scripts/stage_isolated_skills.py",
 )
 ALLOWED_BINARY_SUFFIXES = frozenset({".gif", ".jpeg", ".jpg", ".png", ".webp"})
 EXPECTED_LICENSE_SHA256 = "66ad5029d3b06e5983de8cf062373c123b47e4ad5b8dddf3edc949199d1f2e01"
 EXPECTED_PREDECESSOR_COMMIT = "c6ff5a822bfa4e0a6ef9decf91548173e4fb108c"
+EXPECTED_CHECKOUT_USE = (
+    "uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1"
+)
+EXPECTED_SETUP_PYTHON_USE = (
+    "uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0"
+)
 FORBIDDEN_COMPONENTS = frozenset(
     {
         ".ds_store",
@@ -405,10 +422,16 @@ def inspect_required_files(root: Path, errors: list[str]) -> None:
                 )
             if EXPECTED_CODE_OF_CONDUCT_LINK not in readme_text:
                 errors.append("README.md must link to CODE_OF_CONDUCT.md")
+            if "(examples/finite-set-gap.md)" not in readme_text:
+                errors.append("README.md must link to the finite-set worked example")
             if "`NOT SOURCE-MAPPABLE` stops the workflow" not in readme_text:
                 errors.append("README.md must document the NOT SOURCE-MAPPABLE stop rule")
             if "`PARTIALLY SOURCE-MAPPED`" not in readme_text or "exact defensible rendering" not in readme_text:
                 errors.append("README.md must document the partial-rendering audit boundary")
+            if EXPECTED_ACKNOWLEDGMENT not in readme_text:
+                errors.append(
+                    "README.md must preserve the Bartosz Naskręcki acknowledgment"
+                )
 
     contributing_path = root / "CONTRIBUTING.md"
     if contributing_path.is_file():
@@ -433,6 +456,49 @@ def inspect_required_files(root: Path, errors: list[str]) -> None:
             expected_abstract = f'abstract: "{EXPECTED_PUBLIC_DESCRIPTION}"'
             if abstract_lines != [expected_abstract]:
                 errors.append("CITATION.cff abstract must match the exact public description")
+            expected_date = f'date-released: "{EXPECTED_RELEASE_DATE}"'
+            if expected_date not in citation_text.splitlines():
+                errors.append(
+                    f"CITATION.cff date-released must be {EXPECTED_RELEASE_DATE!r}"
+                )
+
+    changelog_path = root / "CHANGELOG.md"
+    if changelog_path.is_file():
+        try:
+            changelog_text = changelog_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            errors.append(f"cannot read CHANGELOG.md as UTF-8: {error}")
+        else:
+            release_heading = f"## [{EXPECTED_VERSION}] - {EXPECTED_RELEASE_DATE}"
+            if release_heading not in changelog_text.splitlines():
+                errors.append(
+                    "CHANGELOG.md release heading must match the canonical release date"
+                )
+
+    workflow_path = root / ".github/workflows/ci.yml"
+    if workflow_path.is_file():
+        try:
+            workflow_text = workflow_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as error:
+            errors.append(f"cannot read .github/workflows/ci.yml as UTF-8: {error}")
+        else:
+            for expected_use in (EXPECTED_CHECKOUT_USE, EXPECTED_SETUP_PYTHON_USE):
+                if expected_use not in workflow_text:
+                    errors.append(
+                        ".github/workflows/ci.yml must pin GitHub-owned actions "
+                        "to the approved full commit SHAs"
+                    )
+                    break
+            if "persist-credentials: false" not in workflow_text:
+                errors.append(
+                    ".github/workflows/ci.yml must disable persisted checkout credentials"
+                )
+            for version in ('"3.10"', '"3.12"', '"3.14"'):
+                if f"          - {version}" not in workflow_text:
+                    errors.append(
+                        ".github/workflows/ci.yml must test Python 3.10, 3.12, and 3.14"
+                    )
+                    break
 
     conduct_path = root / "CODE_OF_CONDUCT.md"
     if conduct_path.is_file():
@@ -554,6 +620,7 @@ def inspect_skill_wiring(root: Path, skills: dict[str, Path], errors: list[str])
         "For `NOT SOURCE-MAPPABLE`, stop",
         "`NOT SOURCE-MAPPABLE` is a pre-rendering stop",
         "Do not let `STRUCTURAL` absorb source-content normalization",
+        "Every nonclosed issue identifier must appear on at least one `OBLIGATION` ledger row",
     )
     for invariant in convert_invariants:
         if convert and invariant not in convert:
@@ -570,6 +637,8 @@ def inspect_skill_wiring(root: Path, skills: dict[str, Path], errors: list[str])
     forward_invariants = (
         "exact meta-obligation",
         "silently unsupported internal assertion",
+        "Treat validity and citation specificity as separate checks",
+        "A converter-created `OPEN` or `GAP-*` record does not by itself mean",
     )
     for invariant in forward_invariants:
         if forward and invariant not in forward:
@@ -672,6 +741,7 @@ def inspect_evals(root: Path, errors: list[str]) -> None:
     forward_coverage: set[str] = set()
     reverse_coverage: set[str] = set()
     full_pipeline_present = False
+    generation_stages = 0
     gap_prefixes = {
         "GAP": "OPEN",
         "AMB": "AMBIGUOUS",
@@ -760,6 +830,7 @@ def inspect_evals(root: Path, errors: list[str]) -> None:
             for skill_name in ordered_skills:
                 if f"${skill_name}" not in prompt_text:
                     errors.append(f"{case_label}.prompt must explicitly invoke ${skill_name}")
+            generation_stages += len(ordered_skills)
 
         expected = case.get("expected")
         expected_values: list[str] = []
@@ -879,12 +950,17 @@ def inspect_evals(root: Path, errors: list[str]) -> None:
         errors.append(f"evals must cover all mapping kinds: {sorted(MAPPING_KINDS)}")
     if support_coverage != SUPPORT_STATUSES:
         errors.append(f"evals must cover all support statuses: {sorted(SUPPORT_STATUSES)}")
-    if not {"PASS", "FAIL", "INCOMPLETE"}.issubset(forward_coverage):
-        errors.append("evals must cover forward PASS, FAIL, and INCOMPLETE")
+    if forward_coverage != FORWARD_VERDICTS:
+        errors.append(f"evals must cover all forward verdicts: {sorted(FORWARD_VERDICTS)}")
     if reverse_coverage != REVERSE_VERDICTS:
         errors.append(f"evals must cover all reverse verdicts: {sorted(REVERSE_VERDICTS)}")
     if not full_pipeline_present:
         errors.append("evals must include the complete convert-forward-reverse pipeline")
+    if generation_stages != EXPECTED_EVAL_GENERATION_STAGES:
+        errors.append(
+            "evals must define exactly "
+            f"{EXPECTED_EVAL_GENERATION_STAGES} isolated generation stages"
+        )
 
     eval_readme = root / "evals/README.md"
     if eval_readme.is_file():

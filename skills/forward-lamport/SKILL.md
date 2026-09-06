@@ -155,6 +155,8 @@ For each step, explicitly answer:
 5. **Are side conditions proved?** Check nonzero denominators, sign before multiplying inequalities, convergence before exchanging limits or sums, measurability, compactness, freshness, and analogous domain-specific conditions.
 6. **Does the conclusion follow exactly?** Do not accept “morally,” “essentially,” or “up to a harmless detail.”
 
+Treat validity and citation specificity as separate checks. If a rule has a side condition that is already legally available, then that condition is not an unresolved validity obligation. However, when the written justification names the rule but does not identify the active fact that supplies its nontrivial side condition, mark the step `MINOR`, not `OK`; for example, “by cancellation” should cite the active nonzero assumption. This yields `PASS WITH MINOR ISSUES` when no major or critical defect remains. Do not upgrade the omission to a validity failure, and do not silently repair the written citation in the ledger.
+
 When a step cites several earlier steps, verify that their conjunction really implies the claim. When it cites a theorem, reconstruct the substitution from the theorem's variables to the proof's objects.
 
 A step may be left atomic only when the inference is genuinely routine for the intended audience and has no plausible hidden side condition. When uncertain, demand a lower-level expansion rather than guessing.
@@ -215,6 +217,8 @@ Use exactly one overall verdict:
 - **NOT AUDITABLE** — The theorem or proof is missing, unreadable, or too incomplete to reconstruct a proof tree.
 
 Use `INCOMPLETE` only when the proof identifies particular external, admitted, or deliberately omitted support that could still discharge the affected steps if supplied. A silently unsupported internal assertion or construct obligation with no identified potentially discharging source—such as an unproved `PICK` existence claim, case coverage claim, or scope bridge—is a `MAJOR` internal defect and requires `FAIL`. Do not turn every absent argument into “omitted material”; prefer `FAIL` whenever the submitted route itself asserts or uses an unsupported internal obligation.
+
+A converter-created `OPEN` or `GAP-*` record does not by itself mean “omitted material” in the `INCOMPLETE` sense. Reclassify the rendered step from its proof role and source support: when the source presents an internal assertion as part of its route but supplies no proof, the exposed gap remains a `MAJOR` internal defect and requires `FAIL`. Use `CONDITIONAL` for a frozen dependency only when the source identifies it as external unavailable, admitted, or deliberately omitted. Preserve every `AMB-*` reading boundary while making this classification; do not choose the reading that makes the proof succeed, and do not let ambiguity conceal a separately recorded unsupported inference.
 
 Never call an informal audit “machine verified.” State the confidence boundary: the result is a structured mathematical audit, not a kernel-checked proof.
 

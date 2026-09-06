@@ -1,7 +1,7 @@
 {
   "name": "lamport-proof",
   "version": "0.2.0",
-  "description": "Convert existing mathematical proofs into traceable Lamport-style hierarchies and audit the reasoning forward and backward.",
+  "description": "Inspect the reasoning in a proof you already have by making its hierarchy, dependencies, scope, and unresolved obligations explicit.",
   "author": {
     "name": "Wojciech Aleksander Wołoszyn (WWresearch)",
     "email": "contact@wwresearch.org",

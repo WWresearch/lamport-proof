@@ -22,7 +22,14 @@ class RepositoryCheckTests(unittest.TestCase):
         self.temporary_directory = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary_directory.name) / "lamport-proof"
         self.root.mkdir()
-        for directory in (".codex-plugin", ".github", "evals", "scripts", "skills"):
+        for directory in (
+            ".codex-plugin",
+            ".github",
+            "evals",
+            "examples",
+            "scripts",
+            "skills",
+        ):
             shutil.copytree(REPOSITORY_ROOT / directory, self.root / directory)
         for filename in (
             "CHANGELOG.md",
@@ -131,6 +138,7 @@ class RepositoryCheckTests(unittest.TestCase):
             "CONTRIBUTING.md",
             "SECURITY.md",
             "evals/README.md",
+            "examples/finite-set-gap.md",
             "scripts/stage_isolated_skills.py",
         ):
             (self.root / relative).unlink()
@@ -140,7 +148,81 @@ class RepositoryCheckTests(unittest.TestCase):
         self.assertIn("missing required file CONTRIBUTING.md", errors)
         self.assertIn("missing required file SECURITY.md", errors)
         self.assertIn("missing required file evals/README.md", errors)
+        self.assertIn("missing required file examples/finite-set-gap.md", errors)
         self.assertIn("missing required file scripts/stage_isolated_skills.py", errors)
+
+    def test_readme_worked_example_link_is_enforced(self) -> None:
+        readme = self.root / "README.md"
+        readme.write_text(
+            readme.read_text(encoding="utf-8").replace(
+                "(examples/finite-set-gap.md)",
+                "(examples/missing.md)",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("README.md must link to the finite-set worked example", errors)
+
+    def test_readme_acknowledgment_is_enforced(self) -> None:
+        readme = self.root / "README.md"
+        readme.write_text(
+            readme.read_text(encoding="utf-8").replace(
+                check_repository.EXPECTED_ACKNOWLEDGMENT,
+                "Acknowledgment omitted.",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn(
+            "README.md must preserve the Bartosz Naskręcki acknowledgment",
+            errors,
+        )
+
+    def test_release_date_is_consistent(self) -> None:
+        citation = self.root / "CITATION.cff"
+        citation.write_text(
+            citation.read_text(encoding="utf-8").replace(
+                check_repository.EXPECTED_RELEASE_DATE,
+                "2026-01-01",
+                1,
+            ),
+            encoding="utf-8",
+        )
+        changelog = self.root / "CHANGELOG.md"
+        changelog.write_text(
+            changelog.read_text(encoding="utf-8").replace(
+                check_repository.EXPECTED_RELEASE_DATE,
+                "2026-01-01",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("CITATION.cff date-released must be '2026-09-06'", errors)
+        self.assertIn(
+            "CHANGELOG.md release heading must match the canonical release date",
+            errors,
+        )
+
+    def test_ci_release_policy_is_enforced(self) -> None:
+        workflow = self.root / ".github/workflows/ci.yml"
+        workflow.write_text(
+            workflow.read_text(encoding="utf-8")
+            .replace(check_repository.EXPECTED_CHECKOUT_USE, "uses: actions/checkout@v7")
+            .replace("persist-credentials: false", "persist-credentials: true")
+            .replace('          - "3.14"\n', ""),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("must pin GitHub-owned actions to the approved full commit SHAs", errors)
+        self.assertIn("must disable persisted checkout credentials", errors)
+        self.assertIn("must test Python 3.10, 3.12, and 3.14", errors)
 
     def test_exact_public_description_is_enforced_across_surfaces(self) -> None:
         manifest_path = self.root / ".codex-plugin/plugin.json"
@@ -263,6 +345,24 @@ class RepositoryCheckTests(unittest.TestCase):
             errors,
         )
 
+    def test_converter_issue_obligation_row_contract_is_enforced(self) -> None:
+        convert = self.root / "skills/convert-lamport/SKILL.md"
+        convert.write_text(
+            convert.read_text(encoding="utf-8").replace(
+                "Every nonclosed issue identifier must appear on at least one `OBLIGATION` ledger row",
+                "Record unresolved issues in the ledger",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn(
+            "convert-lamport must preserve contract invariant: "
+            "Every nonclosed issue identifier must appear on at least one `OBLIGATION` ledger row",
+            errors,
+        )
+
     def test_converter_no_proof_boundary_is_enforced(self) -> None:
         convert = self.root / "skills/convert-lamport/SKILL.md"
         convert.write_text(
@@ -379,6 +479,65 @@ class RepositoryCheckTests(unittest.TestCase):
 
         errors = "\n".join(self.inspect_fixture())
         self.assertIn("evals must cover all conversion statuses", errors)
+
+    def test_eval_all_forward_verdicts_are_required(self) -> None:
+        manifest = self.read_eval_manifest()
+        minor = self.eval_case(manifest, "forward-minor-citation")
+        expected = minor["expected"]
+        self.assertIsInstance(expected, dict)
+        expected["forward"] = "PASS"
+        self.write_eval_manifest(manifest)
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("evals must cover all forward verdicts", errors)
+
+    def test_forward_citation_specificity_contract_is_enforced(self) -> None:
+        skill = self.root / "skills/forward-lamport/SKILL.md"
+        skill.write_text(
+            skill.read_text(encoding="utf-8").replace(
+                "Treat validity and citation specificity as separate checks",
+                "Consider citation clarity separately",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn(
+            "forward-lamport must preserve contract invariant: "
+            "Treat validity and citation specificity as separate checks",
+            errors,
+        )
+
+    def test_forward_converter_gap_classification_is_enforced(self) -> None:
+        skill = self.root / "skills/forward-lamport/SKILL.md"
+        skill.write_text(
+            skill.read_text(encoding="utf-8").replace(
+                "A converter-created `OPEN` or `GAP-*` record does not by itself mean",
+                "A conversion gap might not mean",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn(
+            "forward-lamport must preserve contract invariant: "
+            "A converter-created `OPEN` or `GAP-*` record does not by itself mean",
+            errors,
+        )
+
+    def test_eval_generation_stage_count_is_enforced(self) -> None:
+        manifest = self.read_eval_manifest()
+        case = self.eval_case(manifest, "combined-unjustified-pick")
+        case["skills"] = ["convert-lamport", "forward-lamport"]
+        expected = case["expected"]
+        self.assertIsInstance(expected, dict)
+        expected.pop("reverse")
+        self.write_eval_manifest(manifest)
+
+        errors = "\n".join(self.inspect_fixture())
+        self.assertIn("evals must define exactly 18 isolated generation stages", errors)
 
     def test_eval_prompt_must_not_disclose_expected_outcome(self) -> None:
         prompt = self.root / "evals/cases/forward-private-substep.md"
